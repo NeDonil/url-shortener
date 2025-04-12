@@ -1,0 +1,6 @@
+*.iml
+*.zip
+target
+*.sh
+.idea
+token.txt
