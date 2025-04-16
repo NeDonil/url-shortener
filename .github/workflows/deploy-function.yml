@@ -40,3 +40,7 @@ jobs:
             target/serverless.todo-1.0-SNAPSHOT.jar
           exclude: |
             **/*.java
+          environment: |
+            DATABASE=${{secrets.DB_NAME}}
+            ENDPOINT=${{secrets.ENDPOINT}}
+            IAM_TOKEN=${{secrets.IAM_TOKEN}}
