@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,6 +31,7 @@ jobs:
         uses: yc-actions/yc-sls-function@v1.0.1
         with:
           yc-sa-json-credentials: ${{secrets.YC_SA_JSON_CREDENTIALS}}
+          folder-id: ${{secrets.FOLDER_ID}}
           function-name: 'url-shortner-java'
           runtime: 'java17'
           memory: '256Mb'
