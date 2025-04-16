@@ -1,46 +1,63 @@
-name: YC Function Deploy
+name: YC Function CI/CD Pipeline
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
-  # Allows you to run this workflow manually from the Actions tab
+    branches: [master]
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  build:
+    name: Build and Test
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      # Set up Java 17
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'maven'
 
       - name: Build with Maven
-        run: mvn -B package --file pom.xml
+        run: mvn -B verify --file pom.xml
 
-      # Deploy to Yandex Cloud
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-function
+          path: target/serverless.url-shorner-1.0-SNAPSHOT.jar
+
+  deploy:
+    name: Deploy to Yandex Cloud
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: java-function
+
       - name: Deploy Function
-        id: sls-func
         uses: yc-actions/yc-sls-function@v1.0.1
         with:
-          yc-sa-json-credentials: ${{secrets.YC_SA_JSON_CREDENTIALS}}
-          folder-id: ${{secrets.FOLDER_ID}}
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+          folder-id: ${{ secrets.FOLDER_ID }}
           function-name: 'url-shortner-java'
           runtime: 'java17'
           memory: '256Mb'
+          execution-timeout: '10s'
           entrypoint: 'com.nedonil.urlshort.UrlShortnerServlet'
           include: |
-            target/serverless.todo-1.0-SNAPSHOT.jar
+            serverless.url-shorner-1.0-SNAPSHOT.jar
           exclude: |
             **/*.java
           environment: |
-            DATABASE=${{secrets.DB_NAME}}
-            ENDPOINT=${{secrets.ENDPOINT}}
-            IAM_TOKEN=${{secrets.IAM_TOKEN}}
+            DATABASE=${{ secrets.DB_NAME }}
+            ENDPOINT=${{ secrets.DB_ENDPOINT }}
+            IAM_TOKEN=${{ secrets.IAM_TOKEN }}
