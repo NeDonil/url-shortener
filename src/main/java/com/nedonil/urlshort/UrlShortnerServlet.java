@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class UrlShortnerServlet extends HttpServlet {
 
@@ -17,11 +18,10 @@ public class UrlShortnerServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        var newPath = req.getParameter("path");
-        sendBadRequestIfEmpty(resp, newPath, "path is required");
-
-        var base62Path = Utils.encodeStringToBase62(newPath);
-        Url url = new Url(UUID.randomUUID().toString(), newPath, base62Path);
+        String pathToShort = req.getReader().lines().collect(Collectors.joining());
+        sendBadRequestIfEmpty(resp, pathToShort, "path is required");
+        var base62Path = Utils.encodeStringToBase62(pathToShort);
+        Url url = new Url(UUID.randomUUID().toString(), pathToShort, base62Path);
         taskDao.save(url);
         resp.getWriter().println(base62Path);
         resp.getWriter().close();
