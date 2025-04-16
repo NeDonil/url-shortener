@@ -25,24 +25,12 @@ jobs:
 
       - name: Build with Maven
         run: mvn -B verify --file pom.xml
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: java-function
-          path: target/serverless.url-shorner-1.0-SNAPSHOT.jar
-
   deploy:
     name: Deploy to Yandex Cloud
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: java-function
-
       - name: Deploy Function
         uses: yc-actions/yc-sls-function@v1.0.1
         with:
@@ -53,10 +41,6 @@ jobs:
           memory: '128Mb'
           execution-timeout: '10s'
           entrypoint: 'com.nedonil.urlshort.UrlShortnerServlet'
-          include: |
-            serverless.url-shorner-1.0-SNAPSHOT.jar
-          exclude: |
-            **/*.java
           environment: |
             DATABASE=${{ secrets.DB_NAME }}
             ENDPOINT=${{ secrets.DB_ENDPOINT }}
