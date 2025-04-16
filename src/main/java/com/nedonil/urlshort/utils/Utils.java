@@ -1,10 +1,10 @@
 package com.nedonil.urlshort.utils;
 
-public class EncodeUtils {
+public class Utils {
 
   private static final String BASE62 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-  private EncodeUtils() {}
+  private Utils() {}
 
   public static String encodeStringToBase62(String input) {
     byte[] bytes = input.getBytes();
@@ -29,5 +29,23 @@ public class EncodeUtils {
       number = number / 62;
     }
     return sb.reverse().toString();
+  }
+
+  public static String extractKeyFromPath(String pathInfo) {
+    if (pathInfo == null || pathInfo.equals("/")) {
+      return null;
+    }
+
+    String normalizedPath = pathInfo.replaceAll("^/+|/+$", "");
+
+    String[] parts = normalizedPath.split("/");
+
+    for (int i = parts.length - 1; i >= 0; i--) {
+      if (!parts[i].isEmpty()) {
+        return parts[i];
+      }
+    }
+
+    return null;
   }
 }
