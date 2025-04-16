@@ -44,11 +44,11 @@ public class UrlDao implements Dao<Url> {
     }
 
     @Override
-    public void deleteById(String urlId) {
+    public void deleteByKey(String key) {
         entityManager.execute(
-                "declare $urlId as Utf8;" +
-                        "delete from urls where url_id = $urlId",
-                Params.of("$taskId", PrimitiveValue.utf8(urlId)));
+                "declare $key as Utf8;" +
+                        "delete from urls where key = key",
+                Params.of("key", PrimitiveValue.utf8(key)));
     }
 
     @Override

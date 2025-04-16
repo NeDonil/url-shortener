@@ -1,0 +1,41 @@
+name: YC Function Deploy
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Set up Java 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      # Deploy to Yandex Cloud
+      - name: Deploy Function
+        id: sls-func
+        uses: yc-actions/yc-sls-function@v1.0.1
+        with:
+          yc-sa-json-credentials: ${{secrets.YC_SA_JSON_CREDENTIALS}}
+          function-name: 'url-shortner-java'
+          runtime: 'java17'
+          memory: '256Mb'
+          entrypoint: 'com.nedonil.urlshort.UrlShortnerServlet'
+          include: |
+            target/serverless.todo-1.0-SNAPSHOT.jar
+          exclude: |
+            **/*.java

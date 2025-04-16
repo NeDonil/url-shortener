@@ -8,7 +8,7 @@ public interface Dao<T> {
 
     void save(T t);
 
-    void deleteById(String id);
+    void deleteByKey(String id);
 
     T findByKey(String key);
 }
