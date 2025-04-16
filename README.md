@@ -31,31 +31,51 @@ CREATE TABLE urls (
 );
 ```
 
-
 ## Environment Variables
 
 The `UrlDao` requires the following environment variables to connect to **Yandex Database (YDB)**:
 
 
-| Variable    | Description                                                                                                          | Example Value                                  |
-| ----------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| `DATABASE`  | Full path to your YDB database (includes endpoint and database name).                                                | `/ru-central1/b1gxxxxxxxx/etn0xxxxxxxx`        |
-| `ENDPOINT`  | YDB server endpoint (gRPC protocol).                                                                                 | `grpcs://ydb.serverless.yandexcloud.net:2135`  |
-| `IAM_TOKEN` | OAuth token for authentication (or [IAM token](https://cloud.yandex.ru/docs/iam/concepts/authorization/iam-token)). | `t1.9euelZq...` (or use `yc iam create-token`) |
+| Variable    | Description                                                                                                        | Example Value                                  |
+| ----------- | ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
+| `DATABASE`  | Full path to your YDB database (includes endpoint and database name).                                              | `/ru-central1/b1gxxxxxxxx/etn0xxxxxxxx`        |
+| `ENDPOINT`  | YDB server endpoint (gRPC protocol).                                                                               | `grpcs://ydb.serverless.yandexcloud.net:2135`  |
+| `IAM_TOKEN` | OAuth token for authentication (or[IAM token](https://cloud.yandex.ru/docs/iam/concepts/authorization/iam-token)). | `t1.9euelZq...` (or use `yc iam create-token`) |
 
-## Deployment (Yandex Cloud)
+## Yandex Cloud Function Deployment Guide
 
-1. Package the servlet into a JAR/WAR.
-2. Deploy to Yandex Cloud Functions or Serverless Containers:
-   bash
+### Prerequisites
+
+1. Install [Yandex Cloud CLI (yc)
+
+```bash
+curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+```
+
+2. Authenticate Yandex cloudyc init
+
+```bash
+yc init
+```
+
+### Deployment Steps
+
+1. **Prepare the package**
 
    ```bash
-   yc serverless function create --name url-shortener  
-   yc serverless function version create \  
-     --function-name url-shortener \  
-     --runtime java17 \  
-     --entry-point com.nedonil.urlshort.UrlShortnerServlet \  
-     --source-path ./target/app.jar
+   chmod +x pack.sh deploy.sh
+   ./pack.sh  # Creates target.zip
+   ```
+2. **Configure environment**
+
+   * Edit `deploy.sh` and set:
+     * `DB_NAME` - Full YDB database path
+     * `DB_ENDPOINT` - YDB endpoint address
+     * `IAM_TOKEN` - Valid IAM token (use `yc iam create-token`)
+3. **Deploy the function**
+
+   ```
+   ./deploy.sh
    ```
 
 ## Example

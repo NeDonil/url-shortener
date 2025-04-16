@@ -1,0 +1,1 @@
+zip -r target.zip src/ pom.xml
