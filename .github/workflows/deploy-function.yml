@@ -16,10 +16,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
 
@@ -49,8 +49,8 @@ jobs:
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
           folder-id: ${{ secrets.FOLDER_ID }}
           function-name: 'url-shortner-java'
-          runtime: 'java17'
-          memory: '256Mb'
+          runtime: 'java21'
+          memory: '128Mb'
           execution-timeout: '10s'
           entrypoint: 'com.nedonil.urlshort.UrlShortnerServlet'
           include: |
